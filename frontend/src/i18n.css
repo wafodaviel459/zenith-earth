@@ -1,0 +1,108 @@
+/* Sélecteur partagé par l'en-tête et les préférences, suivi des règles RTL. */
+.language-select {
+  display: inline-flex;
+  align-items: center;
+  min-width: 76px;
+}
+
+.language-select select {
+  max-width: 112px;
+  height: 34px;
+  padding: 0 25px 0 9px;
+  color: inherit;
+  background: transparent;
+  border: 1px solid currentColor;
+  border-color: #64748b66;
+  border-radius: 8px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.language-select option {
+  color: #0f172a;
+  background: #fff;
+}
+
+.settings-card .language-select select {
+  min-width: 125px;
+  color: #0f172a;
+  background: #fff;
+}
+
+html[data-theme="dark"] .settings-card .language-select select {
+  color: #e8edf5;
+  background: #0a1420;
+}
+
+.i18n-status {
+  display: grid;
+  min-height: 100vh;
+  place-content: center;
+  gap: 12px;
+  padding: 24px;
+  color: #0f172a;
+  background: #f8fafc;
+  text-align: center;
+}
+
+.i18n-status button {
+  justify-self: center;
+  padding: 9px 14px;
+  color: #fff;
+  background: #0f766e;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+html[dir="rtl"] body {
+  direction: rtl;
+}
+
+html[dir="rtl"] .global-nav,
+html[dir="rtl"] .global-nav-actions,
+html[dir="rtl"] .brand,
+html[dir="rtl"] .settings-card-head,
+html[dir="rtl"] .setting-row,
+html[dir="rtl"] .settings-note,
+html[dir="rtl"] .home-disclaimer,
+html[dir="rtl"] .page-back-link,
+html[dir="rtl"] .hero-cta {
+  direction: rtl;
+}
+
+html[dir="rtl"] .search-field > svg {
+  left: auto;
+  right: 11px;
+}
+
+html[dir="rtl"] .search-field input {
+  padding: 0 34px 0 11px;
+}
+
+html[dir="rtl"] .suggestions button {
+  text-align: right;
+}
+
+html[dir="rtl"] .suggestions {
+  text-align: right;
+}
+
+html[dir="rtl"] .auth-form label {
+  text-align: right;
+}
+
+html[dir="rtl"] .settings-card-head {
+  text-align: right;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-reduce-motion="true"] *,
+  html[data-reduce-motion="true"] *::before,
+  html[data-reduce-motion="true"] *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
