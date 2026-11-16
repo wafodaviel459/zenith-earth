@@ -40,7 +40,7 @@ import {
 import type { ICity } from "country-state-city";
 import { useAccessibility } from "./AccessibilityContext";
 import { LanguageSelect, useLanguage } from "./LanguageContext";
-import type { AnalysisResult, Location, MonthlyObservation, Point, TrendProjectionPoint } from "./types";
+import type { AnalysisResult, Location, MonthlyObservation, Point } from "./types";
 import nasaLogo from "../nasa-seeklogo (1).png";
 
 // Le globe 3D est volumineux : son chargement différé accélère l'affichage initial.
@@ -66,6 +66,22 @@ type ResultsChartPoint = {
   city_linear_projection: number | null;
   rural_linear_projection: number | null;
 };
+
+// Redirige vers l'accueil si l'utilisateur accède directement à une page secondaire sans être passé par "/".
+function RequireHomeFirst({ children }: { children: ReactNode }) {
+  const location = useLocation();
+
+  if (location.pathname === "/") {
+    sessionStorage.setItem("zenith_visited_home", "true");
+    return <>{children}</>;
+  }
+
+  if (!sessionStorage.getItem("zenith_visited_home")) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <>{children}</>;
+}
 
 // Petite aide accessible au clavier qui complète les termes statistiques.
 function HelpTip({ children, label }: { children: ReactNode; label: string }) {
@@ -415,7 +431,7 @@ function ExplorePage(props: ExplorePageProps) {
   const selectCascadeCity = (city: ICity | undefined) => {
     if (!city?.latitude || !city.longitude) return;
     const country = countryList.find((item) => item.isoCode === selectedCountry);
-    const target = {     city_name: city.name, country: country?.name || t("explore.selectedCountry"), lat: Number(city.latitude), lon: Number(city.longitude) };
+    const target = { city_name: city.name, country: country?.name || t("explore.selectedCountry"), lat: Number(city.latitude), lon: Number(city.longitude) };
     if (Number.isFinite(target.lat) && Number.isFinite(target.lon)) onLocationChange(target);
   };
 
@@ -742,14 +758,16 @@ function App() {
   return (
     <>
       <Header profile={profile} />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/auth" element={<AuthPage onGuest={() => { setProfile("Guest"); navigate("/explore"); }} onToast={pushToast} onSignIn={handleSignIn} />} />
-        <Route path="/explore" element={<ExplorePage location={location} onLocationChange={setLocation} startYear={startYear} endYear={endYear} onStartYearChange={setStartYear} onEndYearChange={setEndYear} loading={loading} loadingStep={loadingStep} onAnalyze={runAnalysis} onToast={pushToast} />} />
-        <Route path="/results" element={<ResultsPage result={result} onNewAnalysis={startNewAnalysis} />} />
-        <Route path="/settings" element={<SettingsPage />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+      <RequireHomeFirst>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/auth" element={<AuthPage onGuest={() => { setProfile("Guest"); navigate("/explore"); }} onToast={pushToast} onSignIn={handleSignIn} />} />
+          <Route path="/explore" element={<ExplorePage location={location} onLocationChange={setLocation} startYear={startYear} endYear={endYear} onStartYearChange={setStartYear} onEndYearChange={setEndYear} loading={loading} loadingStep={loadingStep} onAnalyze={runAnalysis} onToast={pushToast} />} />
+          <Route path="/results" element={<ResultsPage result={result} onNewAnalysis={startNewAnalysis} />} />
+          <Route path="/settings" element={<SettingsPage />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </RequireHomeFirst>
       {chartVisible && result && <span className="sr-only" aria-live="polite">{t("a11y.expertNotice")}</span>}
       <div className="toast-stack" aria-live="polite" aria-atomic="false">{toasts.map((toast) => <div key={toast.id} className={`toast ${toast.tone}`}><span className="toast-mark">{toast.tone === "success" ? <Check size={15} /> : <Sparkles size={15} />}</span>{toast.text}<button aria-label={t("toast.close")} onClick={() => setToasts((items) => items.filter((item) => item.id !== toast.id))}><X size={14} /></button></div>)}</div>
     </>
